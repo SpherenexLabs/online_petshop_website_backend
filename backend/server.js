@@ -16,10 +16,12 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
+  "https://online-pet-shop-website.vercel.app",
   "https://online-pet-shop-website-pd36.vercel.app",
   "https://online-pet-shop-website-vzsz.vercel.app",
   "https://online-petshop-website-backend-is4i.vercel.app",
-];
+  process.env.FRONTEND_URL,
+].filter(Boolean);
 
 app.use(
   cors({
@@ -33,6 +35,17 @@ app.use(
     credentials: true,
   })
 );
+
+app.options("*", cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
