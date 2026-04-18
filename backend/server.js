@@ -19,7 +19,7 @@ const allowedOrigins = [
   "http://localhost:5174",
   "https://online-pet-shop-website-pd36.vercel.app",
   "https://online-pet-shop-website-vzsz.vercel.app",
-  "https://online-pet-shop-website-r2zrhfggu-spherenexs-projects-543971b9.vercel.app",
+  "https://online-petshop-website-backend-is4i.vercel.app"
 ];
 
 app.use(
@@ -31,15 +31,22 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
+    credentials: true
   })
 );
-
-app.options("*", cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
+// health routes first
+app.get("/", (req, res) => {
+  res.status(200).send("Pet Shop Backend API Running");
+});
+
+app.get("/api", (req, res) => {
+  res.status(200).json({ message: "Pet Shop Backend API Running" });
+});
 
 let dbConnected = false;
 
@@ -48,20 +55,16 @@ app.use(async (req, res, next) => {
     if (!dbConnected) {
       await connectDB();
       dbConnected = true;
+      console.log("MongoDB connected");
     }
     next();
   } catch (error) {
     console.error("DB connection error:", error.message);
-    res.status(500).json({ message: "Database connection failed" });
+    return res.status(500).json({
+      message: "Database connection failed",
+      error: error.message
+    });
   }
-});
-
-app.get("/", (req, res) => {
-  res.send("Pet Shop Backend API Running");
-});
-
-app.get("/api", (req, res) => {
-  res.json({ message: "Pet Shop Backend API Running" });
 });
 
 app.use("/api/auth", authRoutes);
