@@ -1,7 +1,6 @@
 const express = require("express");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const path = require("path");
 const connectDB = require("./config/db");
 
 const authRoutes = require("./routes/authRoutes");
@@ -19,7 +18,7 @@ const allowedOrigins = [
   "http://localhost:5174",
   "https://online-pet-shop-website-pd36.vercel.app",
   "https://online-pet-shop-website-vzsz.vercel.app",
-  "https://online-petshop-website-backend-is4i.vercel.app"
+  "https://online-petshop-website-backend-is4i.vercel.app",
 ];
 
 app.use(
@@ -31,15 +30,13 @@ app.use(
     },
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
+    credentials: true,
   })
 );
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// health routes first
 app.get("/", (req, res) => {
   res.status(200).send("Pet Shop Backend API Running");
 });
@@ -62,7 +59,7 @@ app.use(async (req, res, next) => {
     console.error("DB connection error:", error.message);
     return res.status(500).json({
       message: "Database connection failed",
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -79,7 +76,9 @@ app.use((req, res) => {
 
 app.use((err, req, res, next) => {
   console.error("Server error:", err.message);
-  res.status(500).json({ message: err.message || "Internal server error" });
+  res.status(500).json({
+    message: err.message || "Internal server error",
+  });
 });
 
 if (process.env.NODE_ENV !== "production") {
